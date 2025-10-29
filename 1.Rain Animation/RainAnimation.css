@@ -1,0 +1,182 @@
+/* 样式重置，推荐在所有 CSS 文件开头加上 */
+*
+{
+    /* 不同的浏览器中的 margin 和 padding 可能不同，这里都将其清零，方便后续设置 */
+    margin: 0;
+    padding: 0;
+
+    /* 将盒子模型设置为 border-box，一般情况下更推荐使用这个模型 */
+    /* 该模型下，设置的 width 包含了 content、padding 和 border，其控制的是元素的最终总尺寸 */
+    box-sizing: border-box;
+}
+
+body
+{
+    /* 使得元素转换为 Flex 容器，从而可以方便的进行水平和竖直方向上的居中处理 */
+    display: flex;
+
+    /* 水平与竖直方向上均居中 */
+    justify-content: center;
+    align-items: center;
+
+    /* 确保元素至少占据整个视口的高度 */
+    /* 一般也会用 width: 100%; 确保元素占据父容器的全部宽度 */
+    /* 这里没有设置 width 是因为 body 会继承 html 的宽度，即默认占据浏览器视口的全部宽度，所以一般不需要设置 width: 100%; */
+    min-height: 100vh;
+
+    background-color: #1b1b1b;
+}
+
+.container
+{
+    /* 使得 container 转换为 Flex 容器，位置元素相对于 body 而言 */
+    display: flex;
+    justify-content: center;
+
+    position: relative;
+    width: 100%;
+    height: 400px;
+   
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.container .cloud
+{
+    position: relative;
+    width: 320px;
+    height: 100px;
+    background: #fff;
+    border-radius: 100px;
+
+    /* 在右下角 8px 的地方创建阴影 */
+    filter: drop-shadow(8px 8px 0 #0005);
+
+    /* 创建一个名为 animationCloud 的动画，持续时间为 2s ，中间会发生一个跃变，循环次数为无限循环 */
+    /* 如果 steps(1) 这里是 linear 参数，那么就是一个线性的过渡变化 */
+    animation: animationCloud 2s steps(1) infinite;
+}
+
+/* 闪电动画部分 */
+@keyframes animationCloud
+{
+    /* 该动画将 2s 分为两部分，即 0%~95% 和 95%~100% 两部分 */
+    /* 0% ~ 95% 中，首先在右下角 8px 的地方创建阴影，然后将 .cloud 内的实际元素的亮度拉低 */
+    /* 95% ~ 100% 中，也是首先在右下角 8px 的地方创建阴影，然后在原云朵元素的位置上创建了一个模糊光晕效果，并将亮度拉高，通过后两项模拟瞬时的闪电效果 */
+    0%
+    {
+        filter: drop-shadow(8px 8px 0 #0001) drop-shadow(0 0 0 #fff) brightness(1);
+    }
+
+    95%
+    {
+        filter: drop-shadow(8px 8px 0 #0001) drop-shadow(0 0 50px #fff5) brightness(10);
+    }
+}
+
+/* 在不考虑 position: absolute 的限制条件下，渲染的顺序从下往上为：
+    .cloud 元素的背景和边框-> ::before 伪元素 -> .cloud 的实际内容(cloud 内部的实际 HTML 内容) -> ::after 伪元素 -> .cloud 元素的外边距
+    所以此时 ::before 伪元素创建的内容在 .cloud 的“背景”之上，且在 .cloud 的“实际内容”之下
+*/
+.container .cloud::before
+{
+    /* content 属性是必须的，无论是 before 还是 after，都需要 content 属性才能生效 */
+    content: '';
+
+    /* 上文提到的元素的默认渲染顺序只针适用于非定位元素，一旦获得了定位属性(position = relative / absolute / fixed / sticky)，该规则即不再适用 */
+    /* 对于定位元素，其核心为 z-index 属性 */
+    /* 
+        在考虑 position: absolute 的限制条件下，渲染的顺序从下往上为：
+        非定位元素的背景和边框 -> 非定位元素的 ::before 伪元素 -> 非定位元素的内容 -> 定位元素
+        对于定位元素，z-index 值越高的元素在视觉上越靠上
+    */
+    /* 通过设置 position: absolute，::before 伪元素脱离文档流，视觉上表现为覆盖在 .cloud 的白色背景上，用来构建云朵的复杂形状 */
+    position: absolute;
+
+    /* 相对于 .cloud 进行位置偏移 */
+    top: -50px;
+    left: 40px;
+
+    /* 制作圆形的标准操作：设置元素的高和宽完全一致，然后设置 border-radius 为 50% */
+    /* 如果元素的高和宽不一致，那么设置出来的就是一个椭圆形而不是圆形 */
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+
+    /* 对于 ::before 伪元素和 ::after 伪元素，如果没有设置背景颜色，默认为透明色 */
+    background: #484f59;
+
+    /* 多重阴影技巧：创建一个与主元素颜色相同、尺寸不同、位置精确偏移的第二个圆形 */
+    /* 使用形式：
+            box-shadow: [offsetX] [offsetY] [blurRadius] [spreadRadius] [color]; 
+            如果看见是颜色之前只有三个参数，那么一般是这样的(即 offsetX 和 offsetY 是一样的)：
+            box-shadow: [offsetX / offsetY] [blurRadius] [spreadRadius] [color];
+    */
+    box-shadow: 90px -10px 0 30px #484f59;
+}
+
+.container .cloud::after
+{
+    content: '';
+    position: absolute;
+
+    /* 
+        inset 合并了绝对定位(absolute)元素用于控制偏移量的四个属性：top、right、bottom 和 left 
+        对应关系：insert: top right botton left
+        inset: 0 等价于将一个绝对定位元素的四个偏移量全部设置为0，即使其完全贴合并填充其定位父元素的全部内容区域
+        在这里等价于将创建的 ::after 伪元素完全贴合在 .cloud 元素上
+    */
+    /* 补充一点，这里之所以没有定义元素的尺寸，原因在于通过使用 inset: 0 确定了生成的元素与 .cloud 元素大小完全一致 */
+    inset: 0;
+    background: #484f59;
+
+    /* border-radius 属于不可继承属性，无法从 .cloud 元素上继承下来，所以这里还需要自己设置 */
+    border-radius: 100px;
+
+    /* z-index 设置为 1000 用于提高视觉优先级，确保处于最顶层 */
+    z-index: 1000;
+}
+
+.container .cloud .drop
+{
+    /* 使得雨滴脱离文档流，以 .cloud 为定位基准 */
+    position: absolute;
+    background: #05a2eb;
+
+    /* 雨滴的起始位置距离 .cloud 上方为 40px */
+    top: 40px;
+
+    /* 创建宽为 2px，长为 10px 的雨滴 */
+    width: 2px;
+    height: 10px;
+
+    /* 
+        transform-origin 定义了元素进行 transform 变换时的原点，当元素执行任何 transform 函数时，所有变换都会围绕这个原点发生
+        transform-origin: bottom 是 transform-origin: 50% 100% 的简写；其中 50% 代表水平方向的中心点，100% 代表垂直方向的底部边缘
+    */
+    transform-origin: bottom;
+    animation: animate 2s linear infinite;
+}
+
+@keyframes animate
+{
+    /* translateY()：垂直移动；scaleY()：垂直缩放 */
+    0%
+    {
+        transform: translateY(0) scaleY(1);
+    }
+
+    70%
+    {
+        transform: translateY(360px) scaleY(1);
+    }
+
+    80%
+    {
+        transform: translateY(360px) scaleY(0.2);
+    }
+
+    100%
+    {
+        transform: translateY(360px) scaleY(0) scaleX(15);
+    }
+}

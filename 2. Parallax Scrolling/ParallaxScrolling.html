@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parallax Scrolling</title>
+    <link rel="stylesheet" href="./ParallaxScrolling.css">
+</head>
+<body>
+    <section>
+        <img src="./assets/background.jpg" id="background">
+        <img src="./assets/moon.png" id="moon">
+        <img src="./assets/mountain.png" id="mountain">
+        <img src="./assets/road.png" id="road">
+        <h2 id="text">Moon Light</h2>
+    </section>
+
+    <script>
+        // 获取所有的 DOM 元素：
+        // 通过元素的 id 属性，获取了所有需要进行动态控制的图像和文本元素，并将它们存储在对应的 JavaScript 变量中
+        let bg = document.getElementById("background");
+        let moon = document.getElementById("moon");
+        let mountain = document.getElementById("mountain");
+        let road = document.getElementById("road");
+        let text = document.getElementById("text");
+
+        // 监听页面滚动事件：只要页面发生滚动，即执行后面的匿名函数
+        window.addEventListener("scroll", function() {
+            // 获取当前滚动值：window.scrollY 是一个只读属性，它返回文档从顶部向下滚动的像素数
+            var value = window.scrollY;
+
+            // 每次滚动事件发生时，根据滚动距离 (value) 来修改每个元素的 CSS top 或 left 属性，以实现视觉差
+            bg.style.top = value * 0.5 + 'px';
+            moon.style.left = -value * 0.5 + 'px';
+            mountain.style.top = value * 0.15 + 'px';
+            road.style.top = value * 0.15 + 'px';
+            text.style.top = value * 1 + 'px';
+        })
+    </script>
+</body>
+</html>
