@@ -17,23 +17,45 @@ body
 .loader
 {
     display: flex;
+
+    /* flex-direction 用来设置 loader 中的元素在 Flex 容器中的排列方向 */
+    /* 在这里即控制 loader 中的 div 均是按照行进行排列的，如果设置成 column 则是按照列进行排列的 */
     flex-direction: row;
 }
 
+/* 对 loader 中的每一个 div 元素进行格式上的设置 */
 .loader div
 {
     position: relative;
     width: 40px;
     height: 200px;
-    margin: 20px;
-    overflow: hidden;
     border-radius: 40px;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.05, #edf1f4));
-    border: 2px solid #edf1f4;
+
+    /* margin 用于控制 div 元素之间的间距 */
+    margin: 20px;
+
+    /* 隐藏超出 div 元素的部分 */
+    overflow: hidden;
+
+    /* 创建浮雕（Neumorphism） 设计效果 */
+    /* 
+        inset:创建内阴影;添加 inset 时，阴影会出现在元素的内部，从元素的边缘向内收缩，使其看起来像被压下去、刻进去或凹陷到背景中
+        box-shadow 后如果除了颜色之外只有三个参数的话，那么含义分别为：box-shadow: [offsetX] [offsetY] [blurRadius] [color];
+    */
     box-shadow: 15px 15px 20px rgba(0, 0, 0, 0.1),
                 -15px -15px 20px #fff,
                 inset -5px -5px 5px rgba(255, 255, 255, 0.5),
                 inset 5px 5px 5px rgba(0, 0, 0, 0.05);
+    border: 2px solid #edf1f4;
+    
+    /* 绘制一个从上到下、从透明黑色到背景色的柔和渐变，以增强浮雕效果 */
+    /* 
+        linear-gradient：用于创建直线型的颜色渐变背景 
+        to bottom：渐变方向，告诉浏览器渐变的方向是从顶部开始，到底部结束
+        rgba(0, 0, 0, 0.05)：颜色的起点
+        #edf1f4：颜色的终点
+    */
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.05) #edf1f4);
 }
 
 .loader div::before
@@ -52,21 +74,36 @@ body
                 inset 5px 5px 5px rgba(0, 0, 0, 0.05);
 }
 
+/* 创建可移动的小圆点，圆点随后被用于模拟加载动画中常见的扫描或填充效果 */
 .loader div::after
 {
     content: '';
     position: absolute;
-    width: 36px;
-    height: 36px;
+
+    /* 
+        div 元素设置了 relative 属性，这里的 ::after伪元素会以 div 元素为父元素
+        圆点的初始位置设置在父元素的左上角 
+    */
     top: 0;
     left: 0;
-    background-color: #fff;
+
+    /* 创建背景为白色的小圆点 */
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    box-shadow: -5px -5px 5px rgba(0, 0, 0, 0.2),
-                0 420px 0 400px #2196f3;
+    background-color: #fff;
+    
+    box-shadow: -5px -5px 5px rgba(0, 0, 0, 0.2),   /* 设置小圆点的阴影效果 */
+                0 420px 0 400px #2196f3;            /* 在小圆点上附着了一个巨大的蓝色矩形，会跟随小圆点一起运动，超出部分被忽略了 */    
 
     animation: animate 2.5s ease-in-out infinite;
-    transform: translateY(160px);
+
+    /* 
+        animation-delay 属性定义了动画开始执行之前需要等待的时间，例如 animation-delay: 2s; 表示动画等待 2 秒后开始
+        如果将 animation-delay 设置为负数（例如 -1s），这意味着动画会立即开始播放，但会跳过动画的开头，直接从动画的第1秒开始播放
+        通过给五个 div 元素设置不同的负延迟，它们可以在页面加载时就处于动画的不同阶段
+        var(--i) 是一个无单位的数字（0, 1, 2, 3, 4），calc() 将这个数字与带有单位的时间值 -0.5s 相乘，结果赋给 animation-delay
+    */
     animation-delay: calc(-0.5s * var(--i));
 }
 
@@ -74,7 +111,10 @@ body
 {
     0%
     {
+        /* 将 ::after伪元素中生成的小圆点移动到最下方 */
         transform: translateY(160px);
+
+        /* 翻转 ::after伪元素的颜色：蓝色矩形翻转为黄色或者橙色，白色小圆形翻转后不变 */
         filter: hue-rotate(180deg);
     }
 
@@ -88,4 +128,4 @@ body
         transform: translateY(160px);
         filter: hue-rotate(0deg);
     }
-}
+} 
