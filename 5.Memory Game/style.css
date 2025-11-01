@@ -1,0 +1,137 @@
+*
+{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #0a3c2f;
+}
+
+.container
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* 将所有的元素按照列进行排布，每个元素之间间隔 30px */
+    flex-direction: column;
+    gap: 30px;
+
+    padding: 40px 60px;
+    background-color: #0d614b;
+}
+
+.container h2
+{
+    font-size: 3em;
+    color: #fff;
+
+    /* 所有的字母转为大写，且设置了每个字母的间距 */
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.container .reset
+{
+    padding: 15px 20px;
+    color: #267c65;
+    background-color: #fff;
+    border: none;
+    font-size: 1.5em;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+
+    /* 当鼠标悬停在该元素上时，利用鼠标变化提示用户这时一个可以点击交互的元素 */
+    cursor: pointer;
+
+    /* 增加字体粗细 */
+    font-weight: 600;
+}
+
+.container .reset:focus
+{
+    color: #fff;
+    background-color: #267c65;
+}
+
+.container .game
+{
+    width: 430px;
+    height: 430px;
+    display: flex;
+
+    /* 允许元素在水平方向空间不足之后可以进行换行 */
+    flex-wrap: wrap;
+    gap: 10px;
+
+    /* 保留元素的 3D 空间,使得元素在 3D 旋转时，能够拥有正确的深度和透视效果，而不是被扁平化处理 */
+    transform-style: preserve-3d;
+
+    /* 控制卡片旋转时产生的形变 */
+    perspective: 500px;
+}
+
+/* 
+    1. 这一部分共有五个元素,分别为 .item、.item::after、.item.boxOpen、.item.boxOpen::after 和 .item.boxMatch::after
+    2. 开始的时候有两个元素被渲染,为 .item 和 .item::after, .item 上存在 emoji ,背对玩家,而 .item::after 是纯绿色背景,正对玩家
+    3. 当玩家点击任意一张卡片时,会给该卡片添加一个 boxOpen 类,此时卡片同时具有 .item 和 .boxOpen 类
+       这时候 .item 会触发 .item.boxOpen ,将有 emoji 的那一面转到面向玩家这里;而 .item::after 会触发 .item.boxOpen::after,将背景转到背面
+    4. 如果两张卡片不匹配,会被移除 .boxOpen 类,此时动画回溯,重回 .item 和 .item::after 状态
+    5. 如果两张卡片是匹配的,虽然也会移除 .boxOpen 类,但因为新增了 .boxMatch 类,所以不会动画回溯
+*/
+.item
+{
+    position: relative;
+
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3em;
+    background-color: #fff;
+
+    /* 设置初始状态为翻转状态,即背对着玩家 */
+    transform: rotateY(180deg);
+
+    /* transition 控制翻转时的平滑程度 */
+    transition: 0.5s;
+}
+
+/* 创建了卡片的 “正面”视图,即未翻开时，玩家看到的覆盖层 */
+.item::after
+{
+    content: '';
+    position: absolute;
+
+    /* 相当于同时设置了 top: 0; right: 0; bottom: 0; left: 0; 使伪元素 完全覆盖 整个 .item 卡片 */
+    inset: 0;
+    background-color: #209d7b;
+
+    transition: 0.25s;
+
+    /* 设置初始状态不翻转,是面对玩家的 */
+    transform: rotateY(0deg);
+
+    /* 当 ::after 伪元素翻转 180° 时消失，只露出 .item 上显示的 Emoji */
+    backface-visibility: hidden;
+}
+
+.item.boxOpen
+{
+    /* 点击后翻转 180°,将 emoji 面对玩家 */
+    transform: rotateY(0deg);
+}
+
+.item.boxOpen::after,
+.item.boxMatch::after
+{
+    transform: rotateY(180deg);
+}
