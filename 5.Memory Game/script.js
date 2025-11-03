@@ -1,12 +1,16 @@
+const moveDisplay = document.getElementById('moves-display');
 const emojis = ["😂", "😂", "😍", "😍", "😒", "😒", "😘", "😘", "💕", "💕", "👍", "👍", "😎", "😎", "🥰", "🥰"];
 
 // 核心目标：随机打乱数组
 // emojis.sort()用于对数组进行排序，sort()可以接受一个可选的比较函数 (compare function) 作为参数，用于决定两个元素 a 和 b 谁应该排在前面
 // 当 sort(compareFunction) 执行时，它会多次调用 compareFunction(a, b)，返回正数 b 排在 a 前，返回负数 则 a 排在 b 前
 // 这里 Math.random()生成一个 0 到 1 之间的随机浮点数，并根据结果返回正数或者负数，来决定是否交换两个元素的位置
-var shuf_emojis = emojis.sort(() => (Math.random() > 0.5) ? 2 : -1);
+const shuf_emojis = emojis.sort(() => (Math.random() > 0.5) ? 2 : -1);
 
-for (var i = 0; i < emojis.length; i++) {
+// 记录玩家翻开卡片的总次数
+let totalMove = 0;
+
+for (let i = 0; i < emojis.length; i++) {
     // 为每一个 emoji 创建一个新的 div 元素
     let box = document.createElement('div');
 
@@ -24,6 +28,9 @@ for (var i = 0; i < emojis.length; i++) {
 
         // 2. 每一个被点击的卡片都会被添加一个 boxOpen 类，这里利用 boxOpen 类的数量来判断点击了几张卡片
         if (document.querySelectorAll('.boxOpen').length > 1) {
+            // 增加翻开卡片的次数并更新 UI 显示
+            totalMove++;
+            moveDisplay.textContent = "Total Step: " + totalMove.toString();
 
             // setTimeout(function, delay)：先延时 delay 时间(以毫秒为单位)，然后再执行 function 函数
             // 这里先延时的作用时让玩家能够看到第二张牌上的 emoji，然后再进行匹配判断和翻回等操作

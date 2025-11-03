@@ -38,6 +38,25 @@ body
     letter-spacing: 0.1em;
 }
 
+.container .states-bar
+{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 100%;
+    margin-top: -15px;
+}
+
+.container #moves-display,
+.container #timer-display
+{
+    color: #ddd;
+    font-size: 1.8em;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
 .container .reset
 {
     padding: 15px 20px;
