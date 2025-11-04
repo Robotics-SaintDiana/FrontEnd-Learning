@@ -16,6 +16,7 @@ body
 
 .container
 {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -38,7 +39,7 @@ body
     letter-spacing: 0.1em;
 }
 
-.container .states-bar
+.container .status-bar
 {
     display: flex;
     justify-content: space-between;
@@ -153,4 +154,63 @@ body
 .item.boxMatch::after
 {
     transform: rotateY(180deg);
+}
+
+.container .stars-display
+{
+    position: absolute;
+    
+    /* 将星星移动到 display-bar 的位置 */
+    top: 110px; 
+    font-size: 3em;
+
+    /* 默认隐藏，游戏结束之后显示 */
+    display: none;
+}
+
+.container.game-over .stars-display
+{
+    /* 显示星星 */
+    display: flex;
+}
+
+/*  
+    星星的颜色样式控制：
+    默认为灰色，添加了 game-over 类之后变成金色
+*/
+.container .stars-item
+{
+    color: #666;
+}
+.container.game-over .stars-item.active
+{
+    color: gold;
+    transition: color 0.5s;
+}
+
+.container.game-over #moves-display,
+.container.game-over #timer-display
+{
+    /* display: none; */
+    visibility: hidden;
+}
+
+.container .fastest-time
+{
+    position: absolute;
+
+    /* 将字体移动到星星的下面 */
+    top: 180px;
+    font-size: 2em;
+    font-weight: 500;
+
+    /* 默认隐藏，游戏结束之后显示 */
+    display: none;
+}
+
+.container.game-over .fastest-time
+{
+    display: flex;
+
+    z-index: 100;
 }

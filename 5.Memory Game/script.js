@@ -1,5 +1,12 @@
 const moveDisplay = document.getElementById('moves-display');
+const timerDisplay = document.getElementById('timer-display');
+const container = document.querySelector('.container');
+const starsItems = document.querySelectorAll('.stars-item')
+const fastestTime = document.querySelector('.fastest-time');
+const fastestTimeDisplay = document.querySelector('.fastest-time-display');
+
 const emojis = ["😂", "😂", "😍", "😍", "😒", "😒", "😘", "😘", "💕", "💕", "👍", "👍", "😎", "😎", "🥰", "🥰"];
+const BEST_TIME_KEY = 'memoryGameBestTime';
 
 // 核心目标：随机打乱数组
 // emojis.sort()用于对数组进行排序，sort()可以接受一个可选的比较函数 (compare function) 作为参数，用于决定两个元素 a 和 b 谁应该排在前面
@@ -9,6 +16,53 @@ const shuf_emojis = emojis.sort(() => (Math.random() > 0.5) ? 2 : -1);
 
 // 记录玩家翻开卡片的总次数
 let totalMove = 0;
+
+// 记录玩家游戏的总时长
+let totalTime = 0;
+
+// 定时器启动标识符与ID
+let timerStart = true;
+let timerStop = false;
+let timeoutId = "";
+
+// 格式化当前时间函数
+function updateTime() {
+    // 1. 时间自增
+    totalTime++;
+
+    // 2. 计算当前的秒数和分钟数
+    const currMinutes = Math.floor(totalTime / 60);
+    const currSecond = totalTime % 60;
+
+    // 3. 格式化当前时间
+    const formattedTime = 
+        `Time: ${currMinutes.toString().padStart(2, '0')}:${currSecond.toString().padStart(2, '0')}`;
+
+    // 4. 更新 UI
+    timerDisplay.textContent = formattedTime;
+
+    // 5. 如果游戏没有结束，设置一个超时任务继续计时
+    if (!timerStop) {
+        timeoutId = setTimeout(updateTime, 1000);
+    }
+}
+
+// 根据所用步数获得星级评分
+function getStarsRating() {
+    if (totalMove <= 12) {
+        return 3;
+    } else if (totalMove <= 18) {
+        return 2;
+    } else {
+        return 1;
+    }
+}
+
+// 获取当前记录下的最快时间
+function getFastestTime() {
+    const storedTime = localStorage.getItem(BEST_TIME_KEY);
+    return storedTime == null ? Infinity : parseInt(storedTime);
+}
 
 for (let i = 0; i < emojis.length; i++) {
     // 为每一个 emoji 创建一个新的 div 元素
@@ -20,6 +74,12 @@ for (let i = 0; i < emojis.length; i++) {
 
     // 为每一个 emoji 绑定点击事件函数，即每张卡片被点击时自动执行所编写的 function
     box.onclick = function () {
+        // 如果是第一次点击，那么启动定时器开始计时，否则忽略
+        if (timerStart) {
+            timerStart = !timerStart;
+            updateTime();
+        }
+
         // 如果卡片已经被点击了那就不再执行操作
         if (this.classList.contains('boxMatch')) return;
 
@@ -53,6 +113,28 @@ for (let i = 0; i < emojis.length; i++) {
 
                 // 根据 boxMatch 类的数量检查是否胜利，条件为含有 boxMatch 类的卡片与 emoji 数量一致
                 if (document.querySelectorAll('.boxMatch').length === emojis.length) {
+                    // 定时器停止工作
+                    timerStop = !timerStop;
+                    clearTimeout(timeoutId);
+
+                    // 根据总步数获得星级评分，并更改相关样式
+                    container.classList.add('game-over');
+                    fastestTime.classList.add('game-over');
+
+                    const starsRating = getStarsRating();
+                    starsItems.forEach((starsItem, index) => {
+                        if (index + 1 <= starsRating) {
+                            starsItem.classList.add('active');
+                        }
+                    })
+
+                    // 更改游戏最快时间
+                    const oldtTime = getFastestTime();
+                    const currFastestTime = oldtTime > totalTime ? totalTime : oldtTime;
+                    fastestTimeDisplay.textContent = "Fastest Time: " + currFastestTime.toString();
+                    localStorage.setItem(BEST_TIME_KEY, currFastestTime.toString());
+
+                    // 弹出提示信息
                     alert("win!");
                 }
 
